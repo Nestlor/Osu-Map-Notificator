@@ -8,17 +8,19 @@ from .embeds import build_beatmapset_embed
 def register_commands(bot: commands.Bot, osu_client, monitor) -> None:
 
     @bot.command(name="beatmap")
+    @commands.cooldown(1, 3, commands.BucketType.user)
     async def beatmap(ctx: commands.Context, beatmapset_id: int):
         try:
             data = await osu_client.get_beatmap(beatmapset_id)
             embed = build_beatmapset_embed(data)
 
-            await ctx.send(embed=embed)
+            await ctx.reply(embed=embed, mention_author=False)
 
         except Exception:
-            await ctx.send(
+            await ctx.reply(
                 "Не удалось получить сетку. "
-                "Проверь ID и попробуй позже."
+                "Проверь ID и попробуй позже.",
+                mention_author=False
             )
 
     @bot.tree.command(
@@ -26,6 +28,7 @@ def register_commands(bot: commands.Bot, osu_client, monitor) -> None:
         description="Получить информацию о beatmapset osu!",
     )
     @app_commands.describe(beatmapset_id="ID набора карт")
+    @commands.cooldown(1, 3, commands.BucketType.user)
     async def beatmap_slash(
         interaction: discord.Interaction,
         beatmapset_id: int,
@@ -44,9 +47,10 @@ def register_commands(bot: commands.Bot, osu_client, monitor) -> None:
                 "Не удалось получить сет. Проверь ID и попробуй позже."
             )
 
+    @bot.command(name="check")
     @commands.guild_only()
     @commands.has_permissions(administrator=True)
-    @bot.command(name="check")
+    @commands.cooldown(1, 3, commands.BucketType.user)
     async def check(ctx, limit: int = 10):
         limit = max(1, min(limit, 15))
 
@@ -66,10 +70,11 @@ def register_commands(bot: commands.Bot, osu_client, monitor) -> None:
             logging.exception("Ошибка ручной проверки")
             await ctx.send("При проверке произошла ошибка.")
 
-
+    
     @bot.command(name="setchannel")
     @commands.has_permissions(administrator=True)
     @commands.guild_only()
+    @commands.cooldown(1, 3, commands.BucketType.user)
     async def set_channel(ctx, channel: discord.TextChannel):
         try:
             await monitor.repository.set_channel(ctx.guild.id, channel.id)
@@ -88,6 +93,7 @@ def register_commands(bot: commands.Bot, osu_client, monitor) -> None:
     )
     @app_commands.checks.has_permissions(administrator=True)
     @app_commands.guild_only()
+    @commands.cooldown(1, 3, commands.BucketType.user)
     async def set_channel_slash(
         interaction: discord.Interaction,
         channel: discord.TextChannel,
