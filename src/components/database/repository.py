@@ -80,3 +80,7 @@ class BeatmapRepository:
                 )
             )
             return list(result.all())
+
+    async def get_guild_settings(self, guild_id: int) -> GuildSettings | None:
+        async with SessionFactory() as session:
+            return await session.get(GuildSettings, guild_id)
