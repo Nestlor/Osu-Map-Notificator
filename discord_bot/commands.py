@@ -44,7 +44,8 @@ def register_commands(bot: commands.Bot, osu_client, monitor) -> None:
                 "Не удалось получить сет. Проверь ID и попробуй позже."
             )
 
-
+    @commands.guild_only()
+    @commands.has_permissions(administrator=True)
     @bot.command(name="check")
     async def check(ctx, limit: int = 10):
         limit = max(1, min(limit, 15))
@@ -52,7 +53,10 @@ def register_commands(bot: commands.Bot, osu_client, monitor) -> None:
         await ctx.send(f"Проверяю карты. Лимит: {limit}")
 
         try:
-            sent = await monitor.check_beatmapsets(limit=limit)
+            sent = await monitor.check_beatmapsets(
+                guild_id=ctx.guild.id,
+                limit=limit,
+            )
 
             await ctx.send(
                 f"Проверка завершена. Отправлено сетов: {sent}"

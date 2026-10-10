@@ -4,20 +4,20 @@ from pathlib import Path
 
 import asyncio
 import logging 
-from src.config import (
+from config import (
     DISCORD_TOKEN,
     OSU_CLIENT_ID,
     OSU_CLIENT_SECRET,
     validate_config,
 )
 
-from src.components.database.connection import create_tables, engine
-from src.components.database.repository import BeatmapRepository
-from src.discord_bot.bot import create_bot
-from src.components.osu.auth import OsuAuth
-from src.components.osu.client import OsuClient
-from src.components.tracker.monitor import BeatmapMonitor
-from src.discord_bot.commands import register_commands
+from components.database.connection import create_tables, engine
+from components.database.repository import BeatmapRepository
+from discord_bot.bot import create_bot
+from components.osu.auth import OsuAuth
+from components.osu.client import OsuClient
+from components.tracker.monitor import BeatmapMonitor
+from discord_bot.commands import register_commands
  
 LOG_DIR = Path(__file__).resolve().parent / "logs"
 LOG_DIR.mkdir(exist_ok=True)
