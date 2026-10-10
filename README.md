@@ -59,7 +59,7 @@ Apply database migrations and start the bot:
 
 ```bash
 alembic upgrade head
-python -m src.main
+python -m main
 ```
 
 ## Requirements
