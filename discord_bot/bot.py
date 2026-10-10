@@ -12,7 +12,6 @@ def create_bot() -> commands.Bot:
         intents=intents,
     )
 
-
     @bot.event
     async def on_command_error(
         ctx: commands.Context,
