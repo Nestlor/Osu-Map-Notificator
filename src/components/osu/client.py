@@ -39,11 +39,11 @@ class OsuClient:
             params={
                 "s": status,
                 "sort": "updated_desc",
-                "limit": 10,
+                "limit": 15,
             },
         )
 
-        beatmapsets = data.get("beatmapsets", [])[:10]
+        beatmapsets = data.get("beatmapsets", [])[:15]
 
         logger.info(
             "Статус %s: получено %s сетов",

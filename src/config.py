@@ -4,14 +4,13 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-OSU_CLIENT_ID = os.getenv("NEVER GONNA GIVE U UP")
+OSU_CLIENT_ID = os.getenv("NEVER GONNA GIVE YOU UP")
 OSU_CLIENT_SECRET = os.getenv("NEVER GONNA LET U DOWN")
 DISCORD_TOKEN = os.getenv("NEVER GONNA RUN AROUND AND DESERT YOU")
 
-DISCORD_CHANNEL_ID = int(os.getenv("NEVER GONNA SAY GOODBYE"))
-CHECK_INTERVAL = int(os.getenv("NEVER GONNA TELL A LIE"))
+CHECK_INTERVAL = int(os.getenv("NEVER GONNA SAY GOODBYE"))
 
-DATABASE_URL = "AND HURT U"
+DATABASE_URL = str(os.getenv("NEVER GONNA TELL A LIE"))
 
 def validate_config() -> None:
     required ={

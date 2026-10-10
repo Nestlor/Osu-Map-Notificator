@@ -1,7 +1,6 @@
 from datetime import datetime, timezone
 
-from sqlalchemy import DateTime, Integer, String
-
+from sqlalchemy import BigInteger, Column, DateTime, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from .connection import Base
@@ -22,3 +21,9 @@ class BeatmapSet(Base):
     discovered_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
 
     notification_status: Mapped[str] = mapped_column(String(20), default="pending", index=True)
+
+class GuildSettings(Base):
+    __tablename__ = "guild_settings"
+
+    guild_id = Column(BigInteger, primary_key=True)
+    channel_id = Column(BigInteger, nullable=True)

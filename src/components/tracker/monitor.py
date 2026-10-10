@@ -5,9 +5,9 @@ import discord
 import httpx
 
 from ..database.repository import BeatmapRepository
-from discord_bot.embeds import build_beatmapset_embed
+from src.discord_bot.embeds import build_beatmapset_embed
 from ..osu.client import OsuClient
-from config import CHECK_INTERVAL, DISCORD_CHANNEL_ID
+from src.config import CHECK_INTERVAL
 
 logger = logging.getLogger(__name__)
 
@@ -17,27 +17,25 @@ class BeatmapMonitor:
         self.osu_client = osu_client
         self.repository = repository
         self.bot = bot
-        self.channel_id = DISCORD_CHANNEL_ID
         self.interval = CHECK_INTERVAL
 
         logger.info(
-            "BeatmapMonitor инициализирован. Канал: %s, интервал: %s сек.",
-            self.channel_id,
+            "BeatmapMonitor инициализирован, интервал: %s сек.",
             self.interval,
         )
 
     async def publish_pending(self) -> None:
         logger.info("Начало отправки ожидающих сетов")
 
-        channel = self.bot.get_channel(self.channel_id)
-
-        if channel is None:
-            logger.info("Канал не найден в кэше. Получаю канал через API")
-            channel = await self.bot.fetch_channel(self.channel_id)
-
+        guild_settings = await self.repository.get_all_guild_settings()
         pending = await self.repository.get_pending()
 
+        logger.info("Настроено каналов: %s", len(guild_settings))
         logger.info("Ожидающих отправки сетов: %s", len(pending))
+
+        if not guild_settings:
+            logger.warning("Нет настроенных каналов для уведомлений")
+            return
 
         for beatmapset in pending:
             try:
@@ -59,10 +57,32 @@ class BeatmapMonitor:
                     continue
 
                 embed = build_beatmapset_embed(data)
-                await channel.send(
-                    content="New Map detected:",
-                    embed=embed
-                )
+
+                for settings in guild_settings:
+                    try:
+                        channel = self.bot.get_channel(settings.channel_id)
+
+                        if channel is None:
+                            channel = await self.bot.fetch_channel(
+                                settings.channel_id
+                            )
+
+                        await channel.send(
+                            content="New map detected",
+                            embed=embed
+                        )
+
+                        logger.info(
+                            "Сет %s отправлен в канал %s",
+                            beatmapset.id,
+                            settings.channel_id,
+                        )
+                    except (httpx.HTTPError, discord.HTTPException):
+                        logger.exception(
+                            "Не удалось отправить сет %s в канал %s",
+                            beatmapset.id,
+                            settings.channel_id
+                        )
 
                 await self.repository.mark_sent(beatmapset.id)
 
@@ -157,11 +177,11 @@ class BeatmapMonitor:
             len(selected),
         )
 
-        channel = self.bot.get_channel(self.channel_id)
+        guild_settings = await self.repository.get_all_guild_settings()
 
-        if channel is None:
-            logger.info("Получаю канал через API")
-            channel = await self.bot.fetch_channel(self.channel_id)
+        if not guild_settings:
+            logger.warning("Нет настроенных каналов для уведомлений")
+            return 0
 
         sent = 0
 
@@ -185,18 +205,34 @@ class BeatmapMonitor:
 
                 embed = build_beatmapset_embed(data)
 
-                await channel.send(
-                    content="🆕 New map detected:",
-                    embed=embed,
-                )
+                for settings in guild_settings:
+                    try:
+                        channel = self.bot.get_channel(settings.channel_id)
 
-                sent += 1
+                        if channel is None:
+                            channel = await self.bot.fetch_channel(
+                                settings.channel_id
+                            )
 
-                logger.info(
-                    "Тестовый сет отправлен: %s — %s",
-                    beatmapset["id"],
-                    data.get("title"),
-                )
+                        await channel.send(
+                            content="New test map detected",
+                            embed=embed
+                        )
+                    
+
+                        sent += 1
+
+                        logger.info(
+                            "Тестовый сет отправлен: %s — %s",
+                            beatmapset["id"],
+                            data.get("title"),
+                        )
+                    except (httpx.HTTPError, discord.HTTPException):
+                        logger.exception(
+                            "Не удалось отправить сет %s в канал %s",
+                            beatmapset["id"],
+                            settings.channel_id,
+                        )
 
             except (httpx.HTTPError, discord.HTTPException):
                 logger.exception(
