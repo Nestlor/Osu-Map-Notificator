@@ -5,7 +5,7 @@ its mostly spaghetti code so dont expect much from it
 
 ## Features
 
-- Automatically monitors new and updated beatmapsets.
+- Automatically monitors new and updated beatmapsets(with interval that you can change yourself).
 - Sends notifications to configured Discord channels.
 - Supports independent channel settings for each Discord server.
 - Retrieves beatmapset information by ID.
