@@ -3,8 +3,6 @@
 A simple pet-project for self-purpose use that monitors osu! beatmapsets and sends notifications to configured Discord channels.
 its mostly spaghetti code so dont expect much from it
 
-invite URL - https://discord.com/oauth2/authorize?client_id=1558110914002288730&permissions=4503737066704192&integration_type=0&scope=bot+applications.commands
-
 ## Features
 
 - Automatically monitors new and updated beatmapsets(with interval that you can change yourself).
